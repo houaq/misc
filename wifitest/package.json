@@ -1,0 +1,15 @@
+{
+  "name": "wifitest",
+  "version": "1.0.0",
+  "description": "WiFi test server",
+  "main": "index.js",
+  "scripts": {
+    "test": "./index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "mqtt": "^2.15.0",
+    "terminal-cursor": "0.0.3"
+  }
+}
