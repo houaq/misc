@@ -11,5 +11,8 @@
   "dependencies": {
     "mqtt": "^2.15.0",
     "terminal-cursor": "0.0.3"
+  },
+  "devDependencies": {
+    "eslint": "^4.15.0"
   }
 }

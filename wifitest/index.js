@@ -17,7 +17,7 @@ var table = {};
 mc.on('message', function (topic, message) {
 	var line = message.toString();
 	line = line.split('$')[0];
-  var record = line.split(', ');
+	var record = line.split(', ');
 	var ip = record[0];
 	var row = table[ip];
 	if (!row) {
