@@ -1,0 +1,8 @@
+{
+    "ssid":"BYEE",
+    "pass":"33554432",
+    "mqserver":"mqtt.eyun100.com",
+    "mqport":1883,
+    "mquser":"vbdnode",
+    "mqpass":"node3p"
+}
