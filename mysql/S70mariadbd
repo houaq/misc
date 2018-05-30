@@ -1,0 +1,85 @@
+#!/bin/sh
+
+PATH=/opt/bin:/opt/sbin:/sbin:/bin:/usr/sbin:/usr/bin
+
+PIDFILE="/opt/var/run/mysqld.pid"
+MYSQLD="/opt/bin/mysqld"
+
+IB_DIR=/tmp/ib		# put innodb and sync pointers in this dir
+IB_TGZ=/opt/.ib.tgz	# innodb archive
+DB_DIR=/opt/var/mysql
+DB_TGZ=/opt/.db.tgz	# mysqldump backup
+
+
+mysql_status ()
+{
+	[ -f $PIDFILE ] && [ -d /proc/`cat $PIDFILE` ]
+}
+
+start()
+{
+	# load ibdata to ramdisk
+	mkdir -p $IB_DIR
+	[ -f $IB_TGZ ] && {	# normal shutdown
+		tar xzf $IB_TGZ -C /
+		rm -f $IB_TGZ
+	} || {	# power lost, restore from full backup
+		[ -f $DB_TGZ ] && {
+			rm -rf $DB_DIR
+			tar xzf $DB_TGZ -C /
+		} || {
+			echo 'TODO: restore from sql'
+		}
+	}
+
+	$MYSQLD --pid-file=$PIDFILE > /dev/null 2>&1 &
+}
+
+stop()
+{
+	echo -n "shutting down mysql"
+	kill `cat $PIDFILE` > /dev/null 2>&1
+	while pidof mysqld >/dev/null; do
+		echo -n .
+		sleep 1
+	done
+	tar czf $IB_TGZ $IB_DIR
+	sync
+	echo ' done'
+}
+
+case "$1" in
+	start)
+		if mysql_status
+		then
+			echo mysqld is already running
+		else
+			start
+		fi
+		;;
+	stop)
+		if mysql_status
+		then
+			stop
+		else
+			echo mysqld is not running
+		fi
+		;;
+	status)
+		if mysql_status
+		then
+			echo mysqld is already running
+		else
+			echo mysqld is not running
+		fi
+		;;
+
+	restart)
+		stop
+		sleep 3
+		start
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart|status}"
+		;;
+esac
