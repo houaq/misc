@@ -5,11 +5,8 @@ PATH=/opt/bin:/opt/sbin:/sbin:/bin:/usr/sbin:/usr/bin
 PIDFILE="/opt/var/run/mysqld.pid"
 MYSQLD="/opt/bin/mysqld"
 
-IB_DIR=/tmp/ib		# put innodb and sync pointers in this dir
-IB_TGZ=/opt/.ib.tgz	# innodb archive
-DB_DIR=/opt/var/mysql
+DB_DIR=/tmp/db		# put innodb and sync pointers in this dir
 DB_TGZ=/opt/.db.tgz	# mysqldump backup
-
 
 mysql_status ()
 {
@@ -19,20 +16,15 @@ mysql_status ()
 start()
 {
 	# load ibdata to ramdisk
-	mkdir -p $IB_DIR
-	[ -f $IB_TGZ ] && {	# normal shutdown
-		tar xzf $IB_TGZ -C /
-		rm -f $IB_TGZ
-	} || {	# power lost, restore from full backup
-		[ -f $DB_TGZ ] && {
-			rm -rf $DB_DIR
-			tar xzf $DB_TGZ -C /
-		} || {
-			echo 'TODO: restore from sql'
-		}
+	rm -rf $DB_DIR
+	mkdir -p $DB_DIR/mysql
+	[ -f $DB_TGZ ] && {	# normal shutdown
+		tar xzf $DB_TGZ -C /
+	} || {	# power lost, restore from mysqldump or re-create db
+		echo 'TODO: restore from sql'
 	}
 
-	$MYSQLD --pid-file=$PIDFILE > /dev/null 2>&1 &
+	$MYSQLD --pid-file=$PIDFILE &
 }
 
 stop()
@@ -43,7 +35,7 @@ stop()
 		echo -n .
 		sleep 1
 	done
-	tar czf $IB_TGZ $IB_DIR
+	tar czf $DB_TGZ $DB_DIR
 	sync
 	echo ' done'
 }

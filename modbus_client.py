@@ -62,7 +62,7 @@ def run_sync_client():
     # ------------------------------------------------------------------------# 
     # client = ModbusClient('localhost', port=5020)
     # client = ModbusClient(method='ascii', port='/dev/pts/2', timeout=1)
-    client = ModbusClient(method='rtu', port='/dev/cu.Bluetooth-Incoming-Port', baudrate=9600, timeout=1)
+    client = ModbusClient(method='rtu', port='/dev/ttyS3', baudrate=9600, timeout=1)
     client.connect()
     
     # ----------------------------------------------------------------------- #

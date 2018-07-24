@@ -8,12 +8,9 @@ stop_mysql() {
 	cd /tmp
 	ejall
 	sleep 5
-	reboot
 }
 
-while :; do         
-	sleep 20
-	/opt/bin/mysqlslap \
+/opt/bin/mysqlslap \
         --iterations=10 \
         --concurrency=10  \
         --number-int-cols=5  \
@@ -24,7 +21,7 @@ while :; do
         --number-of-queries=10  \
         --create-schema=dbtest \
         -uroot -padmin || exit 1
-	/opt/bin/mysqlslap \
+/opt/bin/mysqlslap \
         --iterations=10 \
         --concurrency=10  \
         --number-int-cols=5  \
@@ -37,4 +34,4 @@ while :; do
         -uroot -padmin || exit 1
 	stop_mysql
 #	mdev_sd sda1 add
-done
+	reboot
