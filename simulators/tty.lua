@@ -16,6 +16,7 @@ local M = {}
 M.open = function(port, baud, timeout, parity)
     local T = require('posix.termio')
     local F = require('posix.fcntl')
+
     local fd, err = F.open(port, F.O_RDWR + F.O_NOCTTY + F.O_EXCL)
     if not fd then
         return nil, err
@@ -23,10 +24,8 @@ M.open = function(port, baud, timeout, parity)
 
     baud = baud or 9600
     timeout = timeout or 1
-    local vmin = 0
-    if timeout == 0 then vmin = 1 end
 
-    local cflag = T.CS8 + T.CLOCAL + T.CREAD
+    local cflag = T['B' .. baud] + T.CS8 + T.CLOCAL + T.CREAD
     if parity then
         cflag = cflag + T.PARENB
         if parity == 'odd' then
@@ -34,19 +33,17 @@ M.open = function(port, baud, timeout, parity)
         end
     end
 
-    T.tcsetattr(
-        fd, 0,
-        {
-            cflag = cflag,
-            iflag = T.IGNPAR,
-            ispeed = T['B' .. baud],
-            ospeed = T['B' .. baud],
-            cc = {
-                [T.VTIME] = timeout * 10,
-                [T.VMIN] = vmin
-            }
-        }
-    )
+    local tio = { cc = {} }
+    tio.cflag = cflag
+    tio.iflag = T.IGNPAR
+    tio.lflag = 0
+    tio.oflag = 0
+    tio.ispeed = T['B' .. baud]
+    tio.ospeed = T['B' .. baud]
+    tio.cc[T.VTIME] = timeout * 10
+    tio.cc[T.VMIN] = 0
+
+    T.tcsetattr(fd, T.TCSANOW, tio)
 
     return fd
 end
