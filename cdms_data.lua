@@ -46,7 +46,7 @@ local function countPattern(s, p)
 	return count
 end
 
-io.read()	-- skip header
+print(io.read())	-- skip header
 local line = io.read()
 while line do
 	-- 如果数据中间有回车，需要连接多行
@@ -55,15 +55,15 @@ while line do
 	end
 
 	local f = split(line, ',')
-	local ye = trim(f[5])
+	local ye = string.gsub(trim(f[5]), '万', '0000')
 	local b, t = splitYe(ye)
 	if not b then
-		print(line)
+		io.write(f[1], ',', f[2], ',', f[3], ',', f[4], ',', ye, ',',
+				 f[6], ',', f[7], ',', f[8], ',', f[9], '\n')
 	else
 		for _,ye in ipairs(t) do
 			io.write(f[1], ',', f[2], ',', f[3], ',', f[4], ',', ye, ',',
-					 f[6], ',', f[7], ',', f[8], ',', f[9])
-			print()
+					 f[6], ',', f[7], ',', f[8], ',', f[9], '\n')
 		end
 	end
 	line = io.read()
